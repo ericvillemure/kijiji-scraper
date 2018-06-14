@@ -1,0 +1,16 @@
+{
+  "name": "kijiji-scraper",
+  "version": "1.0.0",
+  "description": "scraping kijiji cars to build data for machine learning",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-write-stream": "^2.0.0",
+    "osmosis": "^1.1.6"
+  }
+}
