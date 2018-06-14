@@ -12,47 +12,23 @@ osmosis
 .find('a.title')
 .set('title')
 .follow('@href')
-.find('[itemprop="price"]:first@content')
-.set('price')
-.find('[itemprop="vehicleModelDate"]')
-.set('year')
-.find('[itemprop="brand"]')
-.set('brand')
-.find('[itemprop="model"]')
-.set('model')
-
-
-.find('[itemprop="driveWheelConfiguration"]')
-.set('driveWheelConfiguration')
-
-
-.find('[itemprop="vehicleTransmission"]')
-.set('vehicleTransmission')
-.find('[itemprop="fuelType"]')
-.set('fuelType')
-.find('[itemprop="mileageFromOdometer"]')
-.set('mileageFromOdometer')
-
-
-// .follow('@href')
-
-// .find('p > a')
-// .follow('@href')
-// .set({
-//     'title':        'section > h2',
-//     'description':  '#postingbody',
-//     'subcategory':  'div.breadbox > span[4]',
-//     'date':         'time@datetime',
-//     'latitude':     '#map@data-latitude',
-//     'longitude':    '#map@data-longitude',
-//     'images':       ['img@src']
-// })
+.set({
+    'id': 'li[class^="currentCrumb"] span',
+    'price':'[itemprop="price"]:first@content',
+    'year':'[itemprop="vehicleModelDate"]',
+    'brand':'[itemprop="brand"]',
+    'model':'[itemprop="model"]',
+    'driveWheelConfiguration':'[itemprop="driveWheelConfiguration"]',
+    'vehicleTransmission':'[itemprop="vehicleTransmission"]',
+    'fuelType':'[itemprop="fuelType"]',
+    'mileageFromOdometer':'[itemprop="mileageFromOdometer"]',
+})
 .data(function(listing) {
     writer.write(listing);
     // do something with listing data
 })
 //.log(console.log)
-.error(console.log)
+.error(err => console.log("error", err))
 .done(() => {
     writer.end()
 })
