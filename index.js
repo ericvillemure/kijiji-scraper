@@ -2,7 +2,7 @@ var osmosis = require('osmosis');
 var csvWriter = require('csv-write-stream')
 const fs = require('fs');
 
-var writer = csvWriter()
+var writer = csvWriter({ headers: ["title", "url", 'id','price','year','brand','model','driveWheelConfiguration','vehicleTransmission','fuelType','mileageFromOdometer']})
 writer.pipe(fs.createWriteStream('out.csv',{ encoding: "ascii" }));
 
 var logWriter = csvWriter()
