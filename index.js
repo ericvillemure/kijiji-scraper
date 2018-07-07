@@ -11,7 +11,9 @@ logWriter.pipe(fs.createWriteStream('log.csv'));
 const listOfMakes = ["acura", "alpharomeo", "am_general", "amc", "astnmrtn", "audi", "austinhealey", "bentley", "bmw", "bricklin", "bugatti", "buick", "cadillac", "chevrolet", "chrysler", "daewoo", "diahatsu", "datsun", "dodge", "eagle", "ferrari", "fiat", "ford", "genesis", "geo", "gmc", "honda", "hummer", "hyundai", "infiniti", "inthrvstr", "isuzu", "jaguar", "jeep", "kia", "lmbrghn", "landrover", "lexus", "lincoln", "lotus", "maserati", "maybach", "mazda", "mercedes", "mercury", "mg", "mini", "mitsubishi", "nissan", "oldsmobile", "opel", "peugeot", "plymouth", "pontiac", "porsche", "ram", "renault", "rollsroyce", "saab", "saturn", "scion", "shelby", "smart", "subaru", "suzuki", "tesla", "toyota", "triumph", "volkwagen", "volvo", "othrmake"];
 
 //We need to search by make because kijiji has a maximum page count = 100.  Even then some makes have more than 3000
-listOfMakes.forEach(make => {
+Promise.all(listOfMakes.forEach(make => new Promise((resolve, reject) => 
+    {
+
     
     osmosis
     .get(`https://www.kijiji.ca/b-autos-camions/quebec/${make}/c174l9001a54?ad=offering&a-vendre-par=ownr`)
@@ -48,7 +50,9 @@ listOfMakes.forEach(make => {
         logWriter.write({type: 'error',data: err});
     })
     .done(() => {
-        writer.end()
+        resolve();
     })
+}))).then(() => {
+    writer.end();
+    logWriter.end();
 })
-//.debug(console.log)
