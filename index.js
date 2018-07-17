@@ -13,102 +13,197 @@ var config = {
 };
 var app = firebase.initializeApp(config);
 
-firebase
-  .auth()
-  .signInAnonymously()
-  .catch(function(error) {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    console.log("error authenticating to firebase", errorCode, errorMessage);
-  });
+// firebase
+//   .auth(app)
+//   .signInAnonymously()
+//   .catch(function(error) {
+//     var errorCode = error.code;
+//     var errorMessage = error.message;
+//     console.log("error authenticating to firebase", errorCode, errorMessage);
+//   });
 
-var database = firebase.database();
-
-var writer = csvWriter({
-  headers: [
-    "title",
-    "url",
-    "id",
-    "price",
-    "year",
-    "brand",
-    "model",
-    "driveWheelConfiguration",
-    "vehicleTransmission",
-    "fuelType",
-    "mileageFromOdometer",
-    "dateFound"
-  ]
-});
-writer.pipe(fs.createWriteStream("out.csv", { encoding: "ascii" }));
+// var writer = csvWriter({
+//   headers: [
+//     "title",
+//     "url",
+//     "id",
+//     "price",
+//     "year",
+//     "brand",
+//     "model",
+//     "driveWheelConfiguration",
+//     "vehicleTransmission",
+//     "fuelType",
+//     "mileageFromOdometer",
+//     "dateFound"
+//   ]
+// });
+// writer.pipe(fs.createWriteStream("out.csv", { encoding: "ascii" }));
 
 var logWriter = csvWriter();
 logWriter.pipe(fs.createWriteStream("log.csv"));
 
-//const listOfMakes = ["acura", "alpharomeo", "am_general", "amc", "astnmrtn", "audi", "austinhealey", "bentley", "bmw", "bricklin", "bugatti", "buick", "cadillac", "chevrolet", "chrysler", "daewoo", "diahatsu", "datsun", "dodge", "eagle", "ferrari", "fiat", "ford", "genesis", "geo", "gmc", "honda", "hummer", "hyundai", "infiniti", "inthrvstr", "isuzu", "jaguar", "jeep", "kia", "lmbrghn", "landrover", "lexus", "lincoln", "lotus", "maserati", "maybach", "mazda", "mercedes", "mercury", "mg", "mini", "mitsubishi", "nissan", "oldsmobile", "opel", "peugeot", "plymouth", "pontiac", "porsche", "ram", "renault", "rollsroyce", "saab", "saturn", "scion", "shelby", "smart", "subaru", "suzuki", "tesla", "toyota", "triumph", "volkwagen", "volvo", "othrmake"];
-const listOfMakes = ["acura", "alpharomeo"];
+const listOfMakes = [
+  "acura",
+  "alpharomeo",
+  "am_general",
+  "amc",
+  "astnmrtn",
+  "audi",
+  "austinhealey",
+  "bentley",
+  "bmw",
+  "bricklin",
+  "bugatti",
+  "buick",
+  "cadillac",
+  "chevrolet",
+  "chrysler",
+  "daewoo",
+  "diahatsu",
+  "datsun",
+  "dodge",
+  "eagle",
+  "ferrari",
+  "fiat",
+  "ford",
+  "genesis",
+  "geo",
+  "gmc",
+  "honda",
+  "hummer",
+  "hyundai",
+  "infiniti",
+  "inthrvstr",
+  "isuzu",
+  "jaguar",
+  "jeep",
+  "kia",
+  "lmbrghn",
+  "landrover",
+  "lexus",
+  "lincoln",
+  "lotus",
+  "maserati",
+  "maybach",
+  "mazda",
+  "mercedes",
+  "mercury",
+  "mg",
+  "mini",
+  "mitsubishi",
+  "nissan",
+  "oldsmobile",
+  "opel",
+  "peugeot",
+  "plymouth",
+  "pontiac",
+  "porsche",
+  "ram",
+  "renault",
+  "rollsroyce",
+  "saab",
+  "saturn",
+  "scion",
+  "shelby",
+  "smart",
+  "subaru",
+  "suzuki",
+  "tesla",
+  "toyota",
+  "triumph",
+  "volkwagen",
+  "volvo",
+  "othrmake"
+];
+//const listOfMakes = ["acura", "alpharomeo", "am_general", "amc"];
 
 //We need to search by make because kijiji has a maximum page count = 100.  Even then some makes have more than 3000
-Promise.all(
-  listOfMakes.map(
-    make =>
-      new Promise((resolve, reject) => {
-        osmosis
-          .get(
-            `https://www.kijiji.ca/b-autos-camions/quebec/${make}/c174l9001a54?ad=offering&a-vendre-par=ownr`
-          )
-          .paginate('a:contains("Suivante")', 1)
-          .find("a.title")
-          .set("title")
-          .set({
-            url: "@href"
-          })
-          .then(e => console.log("then", e))
-          .follow("@href")
-          .set({
-            id: 'li[class^="currentCrumb"] span',
-            price: '[itemprop="price"]:first@content',
-            year: '[itemprop="vehicleModelDate"]',
-            brand: '[itemprop="brand"]',
-            model: '[itemprop="model"]',
-            driveWheelConfiguration: '[itemprop="driveWheelConfiguration"]',
-            vehicleTransmission: '[itemprop="vehicleTransmission"]',
-            fuelType: '[itemprop="fuelType"]',
-            mileageFromOdometer: '[itemprop="mileageFromOdometer"]'
-          })
-          .data(function(listing) {
-            const data = {
-              ...listing,
-              mileageFromOdometer:
-                listing.mileageFromOdometer &&
-                listing.mileageFromOdometer.replace(/\s/g, ""),
-              dateFound: Date()
-            };
 
-            var ref = database.ref("listings/" + data.id);
-            ref.once("value", snap => {
-              if (snap.val()) {
-                ref.set(data);
+var promises = listOfMakes.map(
+  make =>
+    new Promise(resolve =>
+      osmosis
+        .get(
+          `https://www.kijiji.ca/b-autos-camions/quebec/${make}/c174l9001a54?ad=offering&a-vendre-par=ownr`
+        )
+        .paginate('a:contains("Suivante")')
+        .find("a.title")
+        .set("title")
+        .set({
+          url: "@href"
+        })
+        .then((context, data, next, done) => {
+          // var database = app.database();
+        //   console.log("then", data.url);
+          var ref = app.database().ref("listings");
+          ref
+            .orderByChild("url")
+            .equalTo(data.url)
+            .once("value", snapshot => {
+              //console.log("once", snapshot.val());
+              if (!snapshot.val()) {
+                //Only fetch the listing if it's not already in the database.  We ignore updates for now
+                next(context, data);
               }
+              done();
             });
 
-            //console.log('write', data);
-            //writer.write(data);
-            // do something with listing data
-          })
-          .log(data => logWriter.write({ date: Date(), type: "log", data }))
-          .error(err => {
-            console.log("error", err);
-            logWriter.write({ type: "error", data: err });
-          })
-          .done(() => {
-            resolve();
-          });
-      })
-  )
-)
+          //   if (context.index % 2 == 0 || true) {
+          //     //console.log("then next");
+          //     next(context, data);
+          //   }
+          //console.log("then done");
+        })
+        .follow("@href")
+        .set({
+          id: 'li[class^="currentCrumb"] span',
+          price: '[itemprop="price"]:first@content',
+          year: '[itemprop="vehicleModelDate"]',
+          brand: '[itemprop="brand"]',
+          model: '[itemprop="model"]',
+          driveWheelConfiguration: '[itemprop="driveWheelConfiguration"]',
+          vehicleTransmission: '[itemprop="vehicleTransmission"]',
+          fuelType: '[itemprop="fuelType"]',
+          mileageFromOdometer: '[itemprop="mileageFromOdometer"]'
+        })
+        .data(function(data) {
+          const listing = {
+            ...data,
+            mileageFromOdometer:
+              data.mileageFromOdometer &&
+              data.mileageFromOdometer.replace(/\s/g, ""),
+            dateFound: Date()
+          };
+          if (!listing.id) {
+            console.log("invalid id", listing);
+          } else {
+            var ref = app.database().ref("listings/" + listing.id);
+            ref.set(listing);
+          }
+        })
+        //.log(data => logWriter.write({ date: Date(), type: "log", data }))
+        .error(err => {
+          console.log("error", err);
+          logWriter.write({ type: "error", data: err });
+        })
+        .done(() => {
+          resolve();
+        })
+    )
+);
+
+var allPromises = Promise.all(promises);
+allPromises
   .then(() => {
-    writer.end();
     logWriter.end();
+    app
+      .delete()
+      .then(function() {
+        console.log("App deleted successfully");
+      })
+      .catch(function(error) {
+        console.log("Error deleting app:", error);
+      });
   })
   .catch(e => console.log("global error", e));
