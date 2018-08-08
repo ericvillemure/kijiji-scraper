@@ -10,6 +10,9 @@ import numpy as np
 
 def cleanColumns( df ):
     df = df.drop(['dateFound','url','title','id','dateFound'],1)
+    df = df.dropna(subset = ['year','price', 'mileageFromOdometer', 'vehicleTransmission'])
+    df = df[(df['mileageFromOdometer'] != 's.o')]
+
 
     df['driveWheelConfiguration'] = df['driveWheelConfiguration'].map({
         '4 roues motrices (4x4)': '4 x 4',
@@ -23,8 +26,10 @@ def cleanColumns( df ):
     df = df.drop(['brand'],1)
 
     df['vehicleTransmission'] = df['vehicleTransmission'].fillna('Autre').astype(str)
-    df['year'] = df['year'].fillna(0).astype(int)
-    df['mileageFromOdometer'] = df['mileageFromOdometer'].fillna('999999').replace('s.o', '999999').astype(int)
+    #df['year'] = df['year'].fillna(0).astype(int)
+    df['year'] = df['year'].astype(int)
+    #df['mileageFromOdometer'] = df['mileageFromOdometer'].fillna('999999').replace('s.o', '999999').astype(int)
+    df['mileageFromOdometer'] = df['mileageFromOdometer'].astype(int)
     df['price'] = df['price'].astype(float)
     return df
 

@@ -24,6 +24,9 @@ df = readJsonFile()
 # df['driveWheelConfiguration'] = driveWheelConfigurationEncoder.fit_transform(df['driveWheelConfiguration'])
 # df['vehicleTransmission'] = vehicleTransmissionEncoder.fit_transform(df['vehicleTransmission'])
 
+df = df[(df['year'] < 2014) & (df['year'] >= 1970) & (df['price'] <= 200000)]
+
+print(df)
 
 df = pd.concat([df, pd.get_dummies(df['model'],prefix='model',dummy_na=True)],axis=1).drop(['model'],axis=1)
 df = pd.concat([df, pd.get_dummies(df['fuelType'],prefix='fuelType',dummy_na=True)],axis=1).drop(['fuelType'],axis=1)
@@ -32,6 +35,8 @@ df = pd.concat([df, pd.get_dummies(df['vehicleTransmission'],prefix='vehicleTran
 
 #print(df.head())
 #print(pd.get_dummies(df['model'],prefix=['model']).head())
+
+
 
 train_model(df)
 
