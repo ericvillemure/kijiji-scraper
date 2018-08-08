@@ -9,6 +9,7 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 from utils import readJsonFile 
+from train import train_model
 
 df = readJsonFile()
 
@@ -16,7 +17,8 @@ df = readJsonFile()
 # driveWheelConfigurationEncoder = preprocessing.LabelEncoder()
 # vehicleTransmissionEncoder = preprocessing.LabelEncoder()
 
-print(df.head())
+
+#print(df.head())
 
 # df['fuelType'] = fuelTypeEncoder.fit_transform(df['fuelType'])
 # df['driveWheelConfiguration'] = driveWheelConfigurationEncoder.fit_transform(df['driveWheelConfiguration'])
@@ -28,8 +30,10 @@ df = pd.concat([df, pd.get_dummies(df['fuelType'],prefix='fuelType',dummy_na=Tru
 df = pd.concat([df, pd.get_dummies(df['driveWheelConfiguration'],prefix='driveWheelConfiguration',dummy_na=True)],axis=1).drop(['driveWheelConfiguration'],axis=1)
 df = pd.concat([df, pd.get_dummies(df['vehicleTransmission'],prefix='vehicleTransmission',dummy_na=True)],axis=1).drop(['vehicleTransmission'],axis=1)
 
-print(df.head())
+#print(df.head())
 #print(pd.get_dummies(df['model'],prefix=['model']).head())
+
+train_model(df)
 
 
 
