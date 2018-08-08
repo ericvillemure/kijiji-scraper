@@ -19,13 +19,21 @@ def cleanColumns( df ):
         'Autre': 'Autre',
         np.nan: 'Autre'}).astype(str)
     df['fuelType'] = df['fuelType'].fillna('Autre').astype(str)
+    df['model'] = df['brand'].astype(str) + '-' + df['model'].astype(str)
+    df = df.drop(['brand'],1)
 
-    df['brand'] = df['brand'].astype(str)
-    df['model'] = df['model'].astype(str)
     df['vehicleTransmission'] = df['vehicleTransmission'].fillna('Autre').astype(str)
     df['year'] = df['year'].fillna(0).astype(int)
+    df['mileageFromOdometer'] = df['mileageFromOdometer'].fillna('999999').replace('s.o', '999999').astype(int)
+    df['price'] = df['price'].astype(float)
     return df
 
 def printSafe( msg ):
     print(msg.encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding))
+
+def readJsonFile():
+    url = 'https://kijiji-scraper.firebaseio.com/listings.json'
+    filename = 'listings.json'
+    df = pd.read_json(filename, orient='index', convert_axes=False)
+    return cleanColumns(df)
 
